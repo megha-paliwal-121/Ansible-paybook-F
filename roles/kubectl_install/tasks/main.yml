@@ -1,0 +1,19 @@
+---
+- name: Ensure /usr/local/bin directory exists on managed node
+  file:
+    path: /usr/local/bin
+    state: directory
+
+- name: Move kubectl binary to /usr/local/bin
+  copy:
+    src: /tmp/kubectl/kubectl-linux-amd64
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+
+- name: Verify kubectl installation
+  command: /usr/local/bin/kubectl version --client
+  register: kubectl_version_output
+
+- name: Print kubectl version
+  debug:
+    msg: "{{ kubectl_version_output.stdout }}"

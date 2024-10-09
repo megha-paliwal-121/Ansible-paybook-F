@@ -1,0 +1,65 @@
+---
+- name: Ensure /usr/local/bin directory exists on managed node
+  file:
+    path: /usr/local/bin
+    state: directory
+
+- name: Copy Docker binaries to /usr/local/bin
+  copy:
+    src: /tmp/docker/docker/*
+    dest: /usr/local/bin/
+    mode: '0755'
+
+- name: Create Docker service file
+  copy:
+    dest: /etc/systemd/system/docker.service
+    content: |
+      [Unit]
+      Description=Docker Application Container Engine
+      Documentation=https://docs.docker.com
+      After=network-online.target firewalld.service
+      Wants=network-online.target
+
+      [Service]
+      Type=notify
+      ExecStart=/usr/local/bin/dockerd
+      ExecReload=/bin/kill -s HUP $MAINPID
+      TimeoutSec=0
+      RestartSec=2
+      Restart=always
+      StartLimitBurst=3
+      StartLimitInterval=60s
+      LimitNOFILE=1048576
+      LimitNPROC=1048576
+      LimitCORE=infinity
+      Delegate=yes
+      KillMode=process
+      OOMScoreAdjust=-500
+      ExecStartPre=-/sbin/modprobe overlay
+      ExecStartPre=-/sbin/modprobe br_netfilter
+      ExecStartPre=-/usr/sbin/sysctl -w net.ipv4.conf.all.forwarding=1
+      ExecStartPre=-/usr/sbin/sysctl -w net.ipv4.ip_forward=1
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Reload systemd
+  command: systemctl daemon-reload
+
+- name: Enable Docker service
+  systemd:
+    name: docker
+    enabled: yes
+
+- name: Start Docker service
+  systemd:
+    name: docker
+    state: started
+
+- name: Verify Docker installation
+  command: /usr/local/bin/docker --version
+  register: docker_version_output
+
+- name: Print Docker version
+  debug:
+    msg: "{{ docker_version_output.stdout }}"

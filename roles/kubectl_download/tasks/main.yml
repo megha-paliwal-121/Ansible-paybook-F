@@ -1,0 +1,17 @@
+---
+- name: Ensure /tmp/kubectl directory exists on master
+  file:
+    path: /tmp/kubectl
+    state: directory
+
+- name: Download kubectl binary from Kubernetes official release
+  get_url:
+    url: "https://dl.k8s.io/release/v1.27.0/bin/linux/amd64/kubectl" 
+    dest: /tmp/kubectl/kubectl-linux-amd64
+    mode: '0755'
+
+- name: Copy kubectl binary to managed node
+  copy:
+    src: /tmp/kubectl/kubectl-linux-amd64
+    dest: /tmp/kubectl/kubectl-linux-amd64
+  delegate_to: managed_node

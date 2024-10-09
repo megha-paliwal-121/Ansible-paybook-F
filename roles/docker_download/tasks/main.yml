@@ -1,0 +1,23 @@
+---
+- name: Ensure /tmp/docker directory exists on master
+  file:
+    path: /tmp/docker
+    state: directory
+
+- name: Download Docker binary from Docker official release
+  get_url:
+    url: "https://download.docker.com/linux/static/stable/x86_64/docker-24.0.2.tgz" 
+    dest: /tmp/docker/docker.tgz
+    mode: '0644'
+
+- name: Extract Docker binary
+  unarchive:
+    src: /tmp/docker/docker.tgz
+    dest: /tmp/docker/
+    remote_src: yes
+
+- name: Copy Docker binaries to managed node
+  copy:
+    src: /tmp/docker/docker/
+    dest: /tmp/docker/
+  delegate_to: managed_node
