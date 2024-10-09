@@ -1,0 +1,11 @@
+---
+- name: Run the JFrog CLI installation script on managed node
+  command: /bin/bash /tmp/jfrog/install-jfrog-cli.sh
+
+- name: Verify JFrog CLI installation
+  command: jfrog --version
+  register: jfrog_version_output
+
+- name: Print JFrog CLI version
+  debug:
+    msg: "{{ jfrog_version_output.stdout }}"

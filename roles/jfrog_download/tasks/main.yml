@@ -1,0 +1,17 @@
+---
+- name: Ensure /tmp/jfrog directory exists on master
+  file:
+    path: /tmp/jfrog
+    state: directory
+
+- name: Download JFrog CLI installation 
+  get_url:
+    url: "https://install-cli.jfrog.io"
+    dest: /tmp/jfrog/install-jfrog-cli.sh
+    mode: '0755'
+
+- name: Copy JFrog CLI installation script to managed node
+  copy:
+    src: /tmp/jfrog/install-jfrog-cli.sh
+    dest: /tmp/jfrog/install-jfrog-cli.sh
+  delegate_to: managed_node
