@@ -4,9 +4,13 @@
   roles:
     - role: kubectl_download
     - role: docker_download
+    - role: jfrog_download
+    - role: helm_download
 
 - hosts: managed_node
   become: true
   roles:
     - role: kubectl_install
     - role: docker_install
+    - role: jfrog_install
+    - role: helm_install

@@ -1,0 +1,19 @@
+---
+- name: Ensure /usr/local/bin directory exists on managed node
+  file:
+    path: /usr/local/bin
+    state: directory
+
+- name: Move Helm binary to /usr/local/bin
+  copy:
+    src: /tmp/helm/helm
+    dest: /usr/local/bin/helm
+    mode: '0755'
+
+- name: Verify Helm installation
+  command: /usr/local/bin/helm version --client
+  register: helm_version_output
+
+- name: Print Helm version
+  debug:
+    msg: "{{ helm_version_output.stdout }}"

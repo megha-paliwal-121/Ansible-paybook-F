@@ -1,0 +1,27 @@
+---
+- name: Ensure /tmp/helm directory exists on master
+  file:
+    path: /tmp/helm
+    state: directory
+
+- name: Set Helm version
+  set_fact:
+    helm_version: "v3.12.0"
+
+- name: Download Helm binary from Helm official release
+  get_url:
+    url: "https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz"
+    dest: /tmp/helm/helm-{{ helm_version }}-linux-amd64.tar.gz
+    mode: '0644'
+
+- name: Extract Helm binary
+  unarchive:
+    src: /tmp/helm/helm-{{ helm_version }}-linux-amd64.tar.gz
+    dest: /tmp/helm/
+    remote_src: yes
+
+- name: Copy Helm binary to managed node
+  copy:
+    src: /tmp/helm/linux-amd64/helm
+    dest: /tmp/helm/helm
+  delegate_to: managed_node
